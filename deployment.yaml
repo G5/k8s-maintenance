@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: yourdomain-maintenance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      maintenance: "true"
+      domain: yourdomain.com
+  template:
+    metadata:
+      name: yourdomain-maintenance
+      labels:
+        maintenance: "true"
+        domain: yourdomain.com
+    spec:
+      containers:
+        - name: nginx
+          image: g5search/k8s-maintenance
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+            limits:
+              memory: "128Mi"
+              cpu: "10m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 5
+          volumeMounts:
+          - name: ssl-secrets
+            mountPath: /etc/secrets
+            readOnly: true
+      volumes:
+        - name: ssl-secrets
+          secret:
+            secretName: yourdomain-ssl-certs
