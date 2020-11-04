@@ -1,7 +1,4 @@
-FROM nginx:stable
-MAINTAINER G5 Engineering <engineering@getg5.com>
+FROM nginx:1.19
 
-STOPSIGNAL SIGQUIT
-
-COPY index.html /usr/share/nginx/html/
-COPY servers.conf /etc/nginx/conf.d/
+COPY index.html /usr/share/nginx/html/index.html
+COPY default.conf /etc/nginx/conf.d/default.conf

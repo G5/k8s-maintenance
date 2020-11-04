@@ -1,28 +1,27 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: yourdomain-maintenance
+  name: maintenance
 spec:
   replicas: 1
   selector:
     matchLabels:
       maintenance: "true"
-      domain: yourdomain.com
   template:
     metadata:
-      name: yourdomain-maintenance
+      name: maintenance
       labels:
         maintenance: "true"
-        domain: yourdomain.com
     spec:
+      imagePullSecrets:
+        - name: gcr-service-account
       containers:
         - name: nginx
-          image: g5search/k8s-maintenance
+          image: gcr.io/g5-images/maintenance-page:latest
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 80
-            - name: https
-              containerPort: 443
           resources:
             requests:
               memory: "64Mi"
@@ -44,11 +43,3 @@ spec:
             initialDelaySeconds: 5
             timeoutSeconds: 3
             failureThreshold: 5
-          volumeMounts:
-          - name: ssl-secrets
-            mountPath: /etc/secrets
-            readOnly: true
-      volumes:
-        - name: ssl-secrets
-          secret:
-            secretName: yourdomain-ssl-certs

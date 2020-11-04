@@ -1,12 +1,12 @@
 ## Kubernetes Maintenance Page
 
-This is a simple maintenance container, which responds to request at any URL with and without SSL with a maintenance announcement. It is available on the Docker Hub at [`g5search/k8s-maintenance`](https://hub.docker.com/r/g5search/k8s-maintenance/).
+This is a simple maintenance container, which responds to request at any URL with a maintenance announcement. It is available on G5's (non-public) Google Container Registry at `gcr.io/g5-images/maintenance-page`.
 
-To run the container with plain Docker, a cert and key files must be volume mounted in at `/etc/ssl/secrets/proxycert` and `/etc/ssl/secrets/proxykey`. This is really intended to run in Kubernetes, using your own modified version of the provided sample Deployment in `deployment.yaml`. Those filenames are specifically using the same secret layout as Google's [nginx-ssl-proxy](https://github.com/GoogleCloudPlatform/nginx-ssl-proxy) image.
+This is really intended to run in Kubernetes, using the provided sample Deployment in `deployment.yaml`.
 
 ### Swapping in a maintenance page
 
-The intention here is that a K8s service pointed at an app using the `nginx-ssl-proxy` image can be re-pointed with selectors to a pod running the maintenance page when the app is undergoing maintenance. That's it.
+The intention here is that a K8s service pointed at an app can be re-pointed with selectors to a pod running the maintenance page when the app is undergoing maintenance. That's it.
 
 K8s exhibits some funky behavior when you attempt to `kubectl apply` a modified service definition (it merges the labels instead of replaces them). You can use `kubectl replace`, but that only works with the absolutely latest revision of the service definition. This behavior seems undefined, though, and could have *dire consequences for a load balancer* if the service is torn down while this happens.
 
